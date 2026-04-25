@@ -1,12 +1,10 @@
 /*
 TASK: SqlRecruitment
 ================================================================================
-DESCRIPTION:
-Recruitment is underway in many companies. For each candidate, calculate the 
-number of distinct companies they have applied to.
+Recruitment is underway in many companies. For each candidate we want to calculate the number of companies they have applied to.
 
-TABLE STRUCTURE:
-----------------
+We are given two tables, candidates and reports, representing data about an ongoing recruitment process. They have the following structure:
+
 create table candidates (
     id integer primary key,
     name varchar(20) not null unique,
@@ -20,77 +18,96 @@ create table reports (
     score integer not null
 );
 
-YOUR TASK:
-Write an SQL query that, for each candidate, calculates the number of distinct 
-companies that he/she applied to. 
+Every row of the table candidates contains information about a single candidate: unique id (id), unique name (name) and age (age). Every row of the table reports contains information about a single test session: unique id (id), name of the company that conducted the test (company), id of a candidate that was tested (candidate_id) and a final score (score).
 
-REQUIREMENTS:
-- The result table should contain three columns: id (of the candidate), 
-  name (of the candidate), and companies (number of distinct companies).
-- Candidates who have not applied to any companies should still appear 
-  in the result with 0 companies.
-- The rows should be ordered by increasing id of the candidates.
+Write an SQL query that, for each candidate, calculates the number of distinct companies that he/she applied to. The table of results should contain three columns: id (id of the candidate), name (name of the candidate) and companies (number of distinct companies the candidate applied to). The rows should be ordered by increasing id of the candidates.
 
-CONSTRAINTS:
-- candidate_id in 'reports' always exists in the 'candidates' table.
-================================================================================
-*/
+Examples:
 
-/* TEST CASES
--- EXAMPLE 1: Multi-test entries for one candidate
--- Lara applied to Codility twice (scores 20 and 30) and ITCompany once.
--- Paul applied to Soft once. Taylor applied to zero.
-INSERT INTO candidates (id, name, age) VALUES 
-(25, 'Taylor', 30),
-(113, 'Paul', 21),
-(10, 'Lara', 19);
+1. Given tables:
 
-INSERT INTO reports (id, company, candidate_id, score) VALUES 
-(1, 'Codility', 10, 20),
-(36, 'Soft', 113, 60),
-(137, 'Codility', 10, 30),
-(2, 'ITCompany', 10, 99);
+candidates:
++-----+--------+-----+
+| id  | name   | age |
++-----+--------+-----+
+| 25  | Taylor | 30  |
+| 113 | Paul   | 21  |
+| 10  | Lara   | 19  |
++-----+--------+-----+
 
-/* Expected Output Example 1:
-id  | name   | companies
-------------------------
-10  | Lara   | 2
-25  | Taylor | 0
-113 | Paul   | 1
-*/
+reports:
++-----+-----------+--------------+-------+
+| id  | company   | candidate_id | score |
++-----+-----------+--------------+-------+
+| 1   | Codility  | 10           | 20    |
+| 36  | Soft      | 113          | 60    |
+| 137 | Codility  | 10           | 30    |
+| 2   | ITCompany | 10           | 99    |
++-----+-----------+--------------+-------+
 
--- EXAMPLE 2: No reports at all
--- This tests your LEFT JOIN logic.
-TRUNCATE TABLE reports, candidates;
+The query should return:
++-----+--------+-----------+
+| id  | name   | companies |
++-----+--------+-----------+
+| 10  | Lara   | 2         |
+| 25  | Taylor | 0         |
+| 113 | Paul   | 1         |
++-----+--------+-----------+
 
-INSERT INTO candidates (id, name, age) VALUES 
-(30, 'Tom', 42),
-(25, 'Kate', 23);
+2. Given tables:
 
-/* Expected Output Example 2:
-id | name | companies
----------------------
-25 | Kate | 0
-30 | Tom  | 0
-*/
+candidates:
++-----+------+-----+
+| id  | name | age |
++-----+------+-----+
+| 30  | Tom  | 42  |
+| 25  | Kate | 23  |
++-----+------+-----+
 
--- EXAMPLE 3: Multiple reports for the same company
--- Jack has 3 reports, but 2 are for 'Codility'. Distinct count should be 2.
-TRUNCATE TABLE reports, candidates;
+reports:
++----+---------+--------------+-------+
+| id | company | candidate_id | score |
++----+---------+--------------+-------+
 
-INSERT INTO candidates (id, name, age) VALUES 
-(25, 'Jack', 32);
+The query should return:
++-----+------+-----------+
+| id  | name | companies |
++-----+------+-----------+
+| 25  | Kate | 0         |
+| 30  | Tom  | 0         |
++-----+------+-----------+
 
-INSERT INTO reports (id, company, candidate_id, score) VALUES 
-(10, 'Codility', 25, 100),
-(82, 'ITCompany', 25, 90),
-(50, 'Codility', 25, 50);
+3. Given tables:
 
-/* Expected Output Example 3:
-id | name | companies
----------------------
-25 | Jack | 2
-*/
+candidates:
++----+------+-----+
+| id | name | age |
++----+------+-----+
+| 25 | Jack | 32  |
++----+------+-----+
+
+reports:
++----+-----------+--------------+-------+
+| id | company   | candidate_id | score |
++----+-----------+--------------+-------+
+| 10 | Codility  | 25           | 100   |
+| 82 | ITCompany | 25           | 90    |
+| 50 | Codility  | 25           | 50    |
++----+-----------+--------------+-------+
+
+The query should return:
++----+------+-----------+
+| id | name | companies |
++----+------+-----------+
+| 25 | Jack | 2         |
++----+------+-----------+
+
+Assume that:
+- values of id column in both candidates and reports are integers within the range [1..1,000,000];
+- values of the name column in candidates and the company column in reports are strings consisting of lower- and uppercase letters;
+- values of the age column are integers within the range [18..100];
+- values of the score column are integers within the range [0..100];
+- every value in the candidate_id column occurs as a value in the id column in the candidates table.
 
 */
 

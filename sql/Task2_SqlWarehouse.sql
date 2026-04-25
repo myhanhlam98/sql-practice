@@ -1,52 +1,83 @@
 /*
 TASK: SqlWarehouse
 ================================================================================
-DESCRIPTION:
-You are given two tables, 'warehouse' and 'orders'. 
+You are given two tables, warehouse and orders, with the following structures:
 
-- Table 'warehouse' contains exactly one row describing the total number of 
-  available shirts in sizes: Small (S), Medium (M), and Large (L).
-- Table 'orders' contains individual orders with a unique 'order_time' and the 
-  number of shirts requested for each size (S, M, L).
+  warehouse
+  S integer NOT NULL
+  M integer NOT NULL
+  L integer NOT NULL
 
-BUSINESS RULES:
-1. Orders must be completed in CHRONOLOGICAL order (by order_time).
-2. An order can only be completed if there are enough products of EACH size 
-   remaining in the warehouse to fulfill that specific order.
-3. Once an order cannot be completed due to insufficient stock, all subsequent 
-   orders are also considered incomplete (processing stops).
+and
 
-GOAL:
-Write an SQL query that finds the 'order_time' of the FIRST order that CANNOT 
-be completed. If all orders can be completed, the query should return NULL.
+  orders
+  order_time timestamp NOT NULL UNIQUE
+  S          integer NOT NULL
+  M          integer NOT NULL
+  L          integer NOT NULL
 
-TABLE STRUCTURE:
-----------------
-CREATE TABLE warehouse (
-    S integer NOT NULL,
-    M integer NOT NULL,
-    L integer NOT NULL
-);
+Table warehouse contains exactly one row describing the number of available shirts in the corresponding sizes: small (S), medium (M) and large (L).
 
-CREATE TABLE orders (
-    order_time timestamp NOT NULL UNIQUE,
-    S integer NOT NULL,
-    M integer NOT NULL,
-    L integer NOT NULL
-);
+Each row of the table orders contains information about individual orders: the unique time the order was created (order_time) and the number of ordered shirts in the corresponding sizes: small (S), medium (M) and large (L). No two rows have the same order_time.
 
-EXAMPLE 1:
-----------
-Warehouse: S: 10, M: 15, L: 12
-Orders:
-- 10:00: (1,1,1)  -> OK
-- 11:00: (2,3,4)  -> OK
-- 12:00: (5,2,1)  -> OK
-- 10:00 (Next Day): (1,1,4) -> OK
-- 10:00 (Day after): (1,2,3) -> FAIL (Not enough Large shirts left)
+Orders will be completed in chronological order of their appearance as long as there are enough products of each size in the warehouse.
 
-Result: 2023-05-13 10:00:00
-================================================================================
+Write an SQL query that finds the time of the first order that cannot be completed. If all orders can be completed, return NULL.
+
+Examples:
+
+1. For the given tables warehouse:
++----+----+----+
+| S  | M  | L  |
++----+----+----+
+| 10 | 15 | 12 |
++----+----+----+
+
+and orders:
++---------------------+---+---+---+
+| order_time          | S | M | L |
++---------------------+---+---+---+
+| 2023-05-10 10:00:00 | 1 | 1 | 1 |
+| 2023-05-10 11:00:00 | 2 | 3 | 4 |
+| 2023-05-10 12:00:00 | 5 | 2 | 1 |
+| 2023-05-12 10:00:00 | 1 | 1 | 4 |
+| 2023-05-13 10:00:00 | 1 | 2 | 3 |
+| 2023-05-14 10:00:00 | 1 | 1 | 1 |
+| 2023-05-14 11:00:00 | 1 | 1 | 1 |
++---------------------+---+---+---+
+
+the query should return the following table:
++---------------------+
+|                     |
++---------------------+
+| 2023-05-13 10:00:00 |
++---------------------+
+
+After the first four orders there is one small shirt, eight medium shirts and two large shirts left in the warehouse. In the fifth order, three large shirts are required. As there are only two remaining, this order cannot be completed.
+
+2. For the given tables warehouse:
++---+---+---+
+| S | M | L |
++---+---+---+
+| 3 | 4 | 5 |
++---+---+---+
+
+and orders:
++---------------------+---+---+---+
+| order_time          | S | M | L |
++---------------------+---+---+---+
+| 2023-04-10 12:50:00 | 2 | 1 | 4 |
+| 2023-04-10 11:00:00 | 1 | 3 | 1 |
++---------------------+---+---+---+
+
+the query should return the following table:
++------+
+|      |
++------+
+| NULL |
++------+
+
+There are enough shirts of each size to complete all orders.
 */
 WITH orders_running_totals AS
 (
@@ -69,9 +100,8 @@ orders_flag_unable_to_complete AS
   FROM orders_running_totals
 )
 SELECT
-MIN(order_time) AS order_time
+MIN(order_time)
 FROM orders_flag_unable_to_complete
 WHERE flag_unable_to_complete = 'X'
-ORDER BY order_time
-LIMIT 1
+
 

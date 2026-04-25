@@ -1,61 +1,64 @@
 /*
 TASK: SqlFlights
 ================================================================================
-DESCRIPTION:
-Find all intermediate cities through which a passenger can travel from 
-New York to Tokyo with exactly one change of flights.
+You are given two tables, flights and airports, with the following structure:
 
-TABLE STRUCTURE:
-----------------
-CREATE TABLE flights (
+create table flights (
     start_port char(3) NOT NULL,
     end_port char(3) NOT NULL
 );
 
-CREATE TABLE airports (
+and
+
+create table airports (
     city_name varchar(17) NOT NULL,
     port_code char(3) NOT NULL
 );
 
-REQUIREMENTS:
-- Identify cities where a passenger can fly: 
-  (New York Airport) -> (City X Airport) -> (Tokyo Airport).
-- Each port_code is assigned to at most one airport.
-- There are no flights with the same start_port and end_port.
+Each row in the table flights contains information about a flight: code of departure port (start_port) and code of destination port (end_port).
 
-OUTPUT SPECIFICATIONS:
-- The result table should contain one column: cities.
-- The list should include the names of the intermediate cities.
+Each row in the table airports contains information about an airport: the city name (city_name) and the port code (port_code). Each port_code is assigned to at most one airport.
 
-EXAMPLE:
---------
-If a flight goes JFK (New York) -> LAX (Los Angeles) and another flight 
-goes LAX -> HND (Tokyo), then 'Los Angeles' should be in the output.
-================================================================================
-*/
+Write an SQL query that finds all cities through which a flight from New York to Tokyo may pass if the passenger wants to make exactly one change of flights.
 
-/* TEST CASES
+Example:
 
--- Insert Airports
-INSERT INTO airports (city_name, port_code) VALUES 
-('New York', 'JFK'),
-('New York', 'LGA'),
-('Paris', 'CDG'),
-('Tokyo', 'HND'),
-('Los Angeles', 'LAX'),
-('Tokyo', 'NRT'),
-('Munich', 'MUC');
+For given tables flights:
 
--- Insert Flights
-INSERT INTO flights (start_port, end_port) VALUES 
-('JFK', 'NRT'), -- Direct (Should be ignored)
-('LGA', 'LAX'), -- Leg 1
-('LAX', 'HND'), -- Leg 2 (Connection: Los Angeles)
-('JFK', 'CDG'), -- Leg 1
-('CDG', 'MUC'), -- Leg 2 (Not Tokyo)
-('JFK', 'HND'), -- Direct
-('JFK', 'MUC'), -- Leg 1
-('MUC', 'NRT'); -- Leg 2 (Connection: Munich)
+start_port | end_port
+-----------+---------
+JFK        | NRT
+LGA        | LAX
+LAX        | HND
+LAX        | HND
+JFK        | CDG
+CDG        | MUC
+JFK        | HND
+JFK        | MUC
+MUC        | NRT
+
+and airports:
+
+city_name   | port_code
+------------+----------
+New York    | JFK
+New York    | LGA
+Paris       | CDG
+Tokyo       | HND
+Los Angeles | LAX
+Tokyo       | NRT
+Munich      | MUC
+
+your query should return:
+
+cities
+-----------
+Los Angeles
+Munich
+
+Assume that:
+
+- there are no flights with the same start_port and end_port.
 
 */
 

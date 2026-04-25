@@ -1,83 +1,102 @@
 /*
 TASK: SqlPhonecalls
 ================================================================================
-DESCRIPTION:
-A telecommunications company wants to identify clients who talked for at least 
-10 minutes in total (as either a caller or a callee) to offer them a new contract. 
+A telecommunications company decided to find which of their clients talked for at least 10 minutes on the phone in total and offer them a new contract.
 
+You are given two tables, phones and calls, with the following structure:
 
-TABLE STRUCTURE:
-----------------
-CREATE TABLE phones (
-    name varchar(20) NOT NULL UNIQUE,
-    phone_number integer NOT NULL UNIQUE
+create table phones (
+    name varchar(20) not null unique,
+    phone_number integer not null unique
 );
 
-CREATE TABLE calls (
-    id integer NOT NULL,
-    caller integer NOT NULL,
-    callee integer NOT NULL,
-    duration integer NOT NULL,
-    UNIQUE(id)
+create table calls (
+    id integer not null,
+    caller integer not null,
+    callee integer not null,
+    duration integer not null,
+    unique(id)
 );
 
+Each row of the table phones contains information about a client: name (name) and phone number (phone_number). Each client has only one phone number. Each row of the table calls contains information about a single call: id (id), phone number of the caller (caller), phone number of the callee (callee) and duration of the call in minutes (duration).
 
-YOUR TASK:
-Write an SQL query that finds all clients who talked for at least 10 minutes 
-in total.
+Write an SQL query that finds all clients who talked for at least 10 minutes in total. The table of results should contain one column: the name of the client (name). Rows should be sorted alphabetically.
 
-REQUIREMENTS:
-- The total duration for a client is the sum of the durations of all calls 
-  where they were either the 'caller' or the 'callee'.
-- The result table should contain one column: the name of the client (name).
-- Rows should be sorted alphabetically.
+Examples:
 
-EXAMPLE:
---------
-If Jack (1234) called Anna (7582) for 8 minutes, and later Jack called 
-Lena (3333) for 2 minutes, Jack's total is 10 minutes. Both Jack and Anna 
-receive credit for the 8-minute call.
+1. Given:
 
-ASSUMPTIONS:
-- Each client has only one phone number.
-- Every phone number in the 'calls' table exists in the 'phones' table.
-- A call is always between two different clients.
-================================================================================
-*/
+phones:
++--------+--------------+
+| name   | phone_number |
++--------+--------------+
+| Jack   | 1234         |
+| Lena   | 3333         |
+| Mark   | 9999         |
+| Anna   | 7582         |
++--------+--------------+
 
+calls:
++----+--------+--------+----------+
+| id | caller | callee | duration |
++----+--------+--------+----------+
+| 25 | 1234   | 7582   | 8        |
+| 7  | 9999   | 7582   | 1        |
+| 18 | 9999   | 3333   | 4        |
+| 2  | 7582   | 3333   | 3        |
+| 3  | 3333   | 1234   | 1        |
+| 21 | 3333   | 1234   | 1        |
++----+--------+--------+----------+
 
-/* TEST CASES
--- Example 1:
--- Table: phones
-INSERT INTO phones (name, phone_number) VALUES 
-('Jack', 1234),
-('Lena', 3333),
-('Mark', 9999),
-('Anna', 7582);
+your query should return:
 
--- Table: calls
-INSERT INTO calls (id, caller, callee, duration) VALUES 
-(25, 1234, 7582, 8),
-(7, 9999, 7582, 1),
-(18, 9999, 3333, 4),
-(2, 7582, 3333, 3),
-(3, 3333, 1234, 1),
-(21, 3333, 1234, 1);
++------+
+| name |
++------+
+| Anna |
+| Jack |
++------+
 
--- Example 2: 
+Jack talked three times and the total duration of his calls is 8 + 1 + 1 = 10. Lena talked four times and the total duration of her calls is 4 + 3 + 1 + 1 = 9. Mark talked twice and the total duration of his calls is 1 + 4 = 5. Anna talked three times and the total duration of her calls is 8 + 1 + 3 = 12. Anna and Jack both talked for at least 10 minutes.
 
--- Table: phones
-INSERT INTO phones (name, phone_number) VALUES 
-('John', 6356),
-('Addison', 4315),
-('Kate', 8003),
-('Ginny', 9831);
+2. Given:
 
--- Table: calls
-INSERT INTO calls (id, caller, callee, duration) VALUES 
-(65, 8003, 9831, 7),
-(100, 9831, 8003, 3),
-(145, 4315, 9831, 18);
+phones:
++---------+--------------+
+| name    | phone_number |
++---------+--------------+
+| John    | 6356         |
+| Addison | 4315         |
+| Kate    | 8003         |
+| Ginny   | 9831         |
++---------+--------------+
+
+calls:
++-----+--------+--------+----------+
+| id  | caller | callee | duration |
++-----+--------+--------+----------+
+| 65  | 8003   | 9831   | 7        |
+| 100 | 9831   | 8003   | 3        |
+| 145 | 4315   | 9831   | 18       |
++-----+--------+--------+----------+
+
+your query should return:
+
++---------+
+| name    |
++---------+
+| Addison |
+| Ginny   |
+| Kate    |
++---------+
+
+Assume that:
+- values of the name column are strings consisting of lower- and uppercase letters;
+- values of the phone_number column are integers within the range [1,000..9,999];
+- values of id column in calls are integers within the range [1..1,000,000];
+- each value in the caller or callee column occurs in the phone_number column in phones table;
+- in each row of calls table, values of caller and callee are different (the call is between two different clients);
+- values of the duration column are integers within the range [1..100].
 
 */
 

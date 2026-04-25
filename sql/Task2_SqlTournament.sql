@@ -1,17 +1,8 @@
 /*
 TASK: SqlTournamentWinners
 ================================================================================
-DESCRIPTION:
-Compute the winner in each group. The winner is the player who scored the maximum 
-total number of points within the group.
+You are given two tables, players and matches, with the following structure:
 
-TIE-BREAKING RULES:
--------------------
-If there is more than one such player (a tie in score), the winner is the one 
-with the LOWEST player_id.
-
-TABLE STRUCTURE:
-----------------
 create table players (
     player_id integer not null unique,
     group_id integer not null
@@ -25,31 +16,51 @@ create table matches (
     second_score integer not null
 );
 
-REQUIREMENTS:
-- Return a table containing 'group_id' and 'winner_id'.
-- Every group must have a winner (even if a player played 0 matches).
-- Order results by group_id ascending.
-================================================================================
+Each record in the table players represents a single player in the tournament. The column player_id contains the ID of each player. The column group_id contains the ID of the group that each player belongs to.
 
+Each record in the table matches represents a single match in the group stage. The column first_player (second_player) contains the ID of the first player (second player) in each match. The column first_score (second_score) contains the number of points scored by the first player (second player) in each match. You may assume that, in each match, players belong to the same group.
 
-TEST CASE: Multiple groups with ties and inactivity
-TRUNCATE TABLE players, matches;
+You would like to compute the winner in each group. The winner in each group is the player who scored the maximum total number of points within the group. If there is more than one such player, the winner is the one with the lowest ID.
 
-INSERT INTO players (player_id, group_id) VALUES 
-(20, 2), (30, 1), (40, 3), (45, 1), (50, 2), (65, 1);
+Write an SQL query that returns a table containing the winner of each group. Each record should contain the ID of the group and the ID of the winner in this group. Records should be ordered by increasing ID number of the group.
 
-INSERT INTO matches (match_id, first_player, second_player, first_score, second_score) VALUES 
-(1, 30, 45, 10, 12),
-(2, 20, 50, 5, 5),   -- Tie in score: player 20 should win (lower ID)
-(13, 65, 45, 10, 10),
-(5, 30, 65, 3, 15),
-(42, 45, 65, 8, 4);
+For example, given:
 
--- Expected Result:
--- Group 1: Player 45 (30 pts)
--- Group 2: Player 20 (5 pts, tie-break by ID)
--- Group 3: Player 40 (0 pts, only player in group)
+players:
+ player_id | group_id
+-----------+----------
+ 20        | 2
+ 30        | 1
+ 40        | 3
+ 45        | 1
+ 50        | 2
+ 65        | 1
 
+matches:
+ match_id | first_player | second_player | first_score | second_score
+----------+--------------+---------------+-------------+--------------
+ 1        | 30           | 45            | 10          | 12
+ 2        | 20           | 50            | 5           | 5
+ 13       | 65           | 45            | 10          | 10
+ 5        | 30           | 65            | 3           | 15
+ 42       | 45           | 65            | 8           | 4
+
+your query should return:
+ group_id | winner_id
+----------+-----------
+ 1        | 45
+ 2        | 20
+ 3        | 40
+
+In group 1 the winner is player 45 with the total score of 30 points. In group 2 both players scored 5 points, but player 20 has lower ID and is a winner. In group 3 there is only one player, and although she didn't play any matches, she is a winner.
+
+Assume that:
+- groups are numbered with consecutive integers beginning from 1;
+- every player from table matches occurs in table players;
+- in each match players belong to the same group;
+- score is a value between 0 and 1000000;
+- there is at most 100 players;
+- there is at most 100 matches.
 */
 WITH player_scores AS
 (

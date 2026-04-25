@@ -1,73 +1,58 @@
 /*
 TASK: SqlRecommendations
 ================================================================================
-DESCRIPTION:
-You are given a table of people's opinions about places in a city. Your task is 
-to generate a list of the recommended places. 
+You are given a table of people's opinions about places in a city:
 
-A place is recommended if it has STRICTLY MORE 'recommended' opinions than 
-'not recommended' opinions.
-
-TABLE STRUCTURE:
-----------------
 create table opinions (
     id int not null primary key,
     place varchar(255) not null,
     opinion varchar(255) not null
 );
 
-REQUIREMENTS:
-- The result should be a table with one column named 'place'.
-- The names in the returned table should appear in alphabetical order.
-- Assume that in alphabetical order, the space character is lower than any letter.
+Each row contains a place's name and an opinion about it, which is either recommended or not recommended. Your task is to generate a list of the recommended places. It should be a table with one column (named place), containing the names of the places which have strictly more recommended than not recommended opinions. The names in the returned table should appear in alphabetical order. Assume that in alphabetical order, the space character is lower than any letter, as it is by default in SQL.
 
-EXAMPLES:
+Examples:
+
+1. Given table opinions:
+
+id | place         | opinion
+---+---------------+----------------
+ 1 | mount nawo oz | recommended
+ 2 | mount nawo oz | not recommended
+ 3 | codility      | recommended
+ 4 | codility      | recommended
+ 5 | codility      | recommended
+ 6 | qr week       | recommended
+ 7 | qr week       | not recommended
+ 8 | cafe worst    | not recommended
+ 9 | mount nawo oz | recommended
+
+your query should return:
+
+place
+-------------
+codility
+mount nawo oz
+
+2. Given table opinions:
+
+id | place      | opinion
+---+------------+----------------
+ 1 | cafe best  | recommended
+ 2 | cafe bad   | recommended
+ 3 | cafe worst | not recommended
+ 4 | cafe bad   | not recommended
+ 5 | cafe bad   | not recommended
+
+your query should return:
+
+place
 ---------
-If 'mount nawo oz' has 2 'recommended' and 1 'not recommended', it is included.
-If 'qr week' has 1 'recommended' and 1 'not recommended', it is NOT included 
-(because it is not strictly more).
-================================================================================
-*/
+cafe best
 
-/* TEST CASES
-
-CREATE TABLE opinions (
-    id int NOT NULL PRIMARY KEY,
-    place varchar(255) NOT NULL,
-    opinion varchar(255) NOT NULL
-
-Example 1:
-
-TRUNCATE TABLE opinions;
-
-INSERT INTO opinions (id, place, opinion) VALUES 
-(1, 'mount nawo oz', 'recommended'),
-(2, 'mount nawo oz', 'not recommended'),
-(3, 'codility', 'recommended'),
-(4, 'codility', 'recommended'),
-(5, 'codility', 'recommended'),
-(6, 'qr week', 'recommended'),
-(7, 'qr week', 'not recommended'),
-(8, 'cafe worst', 'not recommended'),
-(9, 'mount nawo oz', 'recommended');
-
--- Expected Result:
--- codility
--- mount nawo oz
-
-Example 2:
-TRUNCATE TABLE opinions;
-
-INSERT INTO opinions (id, place, opinion) VALUES 
-(1, 'cafe best', 'recommended'),
-(2, 'cafe bad', 'recommended'),
-(3, 'cafe worst', 'not recommended'),
-(4, 'cafe bad', 'not recommended'),
-(5, 'cafe bad', 'not recommended');
-
--- Expected Result:
--- cafe best
-);
+Assume that:
+- column opinion contains only values recommended and/or not recommended;
+- values in column place consist only of small english letters and spaces.
 
 */
 

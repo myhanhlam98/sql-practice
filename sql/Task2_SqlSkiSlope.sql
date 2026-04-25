@@ -1,19 +1,10 @@
 /*
 TASK: SqlSkiSlope
 ================================================================================
-DESCRIPTION:
-A ski resort company is planning to construct a new ski slope using a pre-existing 
-network of mountain huts and trails between them. 
+A ski resort company is planning to construct a new ski slope using a pre-existing network of mountain huts and trails between them. A new slope has to begin at one of the mountain huts, have a middle station at another hut connected with the first one by a direct trail, and end at the third mountain hut which is also connected by a direct trail to the second hut. The altitude of the three huts chosen for constructing the ski slope has to be strictly decreasing.
 
-A new slope must:
-1. Begin at one mountain hut (startpt).
-2. Have a middle station at another hut (middlept) connected to the first by a direct trail.
-3. End at a third mountain hut (endpt) connected by a direct trail to the second hut.
-4. The altitude of the three huts chosen must be STRICTLY DECREASING 
-   (altitude(startpt) > altitude(middlept) > altitude(endpt)).
+You are given two SQL tables, mountain_huts and trails, with the following structure:
 
-TABLE STRUCTURE:
-----------------
 create table mountain_huts (
     id integer not null,
     name varchar(40) not null,
@@ -27,38 +18,69 @@ create table trails (
     hut2 integer not null
 );
 
-REQUIREMENTS:
-- Each entry in the 'trails' table represents a direct connection between huts.
-- Trails are BIDIRECTIONAL (if a trail exists between hut 1 and 2, it can be 
-  traveled in either direction).
-- Find all triplets (startpt, middlept, endpt) representing names of the huts.
-- Output can be ordered in any way.
+Each entry in the table trails represents a direct connection between huts with IDs hut1 and hut2. Note that all trails are bidirectional.
 
-ASSUMPTIONS:
-- No trail goes from a hut back to itself.
-- At most one direct trail connects any two huts.
-- Each hut in 'trails' exists in 'mountain_huts'.
-================================================================================
+Create a query that finds all triplets (startpt, middlept, endpt) representing the mountain huts that may be used for construction of a ski slope. Output returned by the query can be ordered in any way.
 
-TEST CASE
+Examples:
 
-INSERT INTO mountain_huts (id, name, altitude) VALUES 
-(1, 'Adam', 2100), 
-(2, 'Emily', 1800), 
-(3, 'Diana', 1800), 
-(4, 'Bobs Inn', 1400), 
-(5, 'Carls Inn', 1350), 
-(6, 'Hannah', 2300);
+1. Given the tables:
 
-INSERT INTO trails (hut1, hut2) VALUES 
-(2, 1), -- Emily <-> Adam
-(2, 3), -- Emily <-> Diana
-(2, 4), -- Emily <-> Bobs Inn
-(2, 5), -- Emily <-> Carls Inn
-(3, 1), -- Diana <-> Adam
-(3, 4), -- Diana <-> Bobs Inn
-(3, 5), -- Diana <-> Carls Inn
-(3, 6); -- Diana <-> Hannah
+mountain_huts:
+ id | name    | altitude
+----+---------+----------
+  1 | Dakonat | 1900
+  2 | Natisa  | 2100
+  3 | Gajantut| 1600
+
+[...trails data omitted for brevity...]
+
+your query should return:
+ startpt  | middlept | endpt
+----------+----------+-------
+ Dakonat  | Gajantut | Tupur
+ Dakonat  | Tupur    | Rifat
+ Gajantut | Tupur    | Rifat
+ Natisa   | Gajantut | Tupur
+
+2. Given the tables:
+
+mountain_huts:
+ id | name      | altitude
+----+-----------+----------
+  1 | Adam      | 2100
+  2 | Emily     | 1800
+  3 | Diana     | 1800
+  4 | Bobs Inn  | 1400
+  5 | Carls Inn | 1350
+  6 | Hannah    | 2300
+
+trails:
+ hut1 | hut2
+------+------
+    2 | 1
+    2 | 3
+    2 | 4
+    2 | 5
+    3 | 1
+    3 | 4
+    3 | 5
+    3 | 6
+
+your query should return:
+ startpt | middlept | endpt
+---------+----------+-----------
+ Adam    | Diana    | Bobs Inn
+ Adam    | Diana    | Carls Inn
+ Adam    | Emily    | Bobs Inn
+ Adam    | Emily    | Carls Inn
+ Hannah  | Diana    | Bobs Inn
+ Hannah  | Diana    | Carls Inn
+
+Assume that:
+- there is no trail going from a hut back to itself;
+- for every two huts there is at most one direct trail connecting them;
+- each hut from table trails occurs in table mountain_huts.
 
 */
 
